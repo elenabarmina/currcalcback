@@ -29,7 +29,7 @@ public class AppConfig extends Application {
     }
 
     public static String getProperty(String name){
-        return properties.getProperty("sample.property");
+        return properties.getProperty(name);
     }
 
 }

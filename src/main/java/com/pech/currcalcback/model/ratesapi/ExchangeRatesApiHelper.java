@@ -56,7 +56,7 @@ public class ExchangeRatesApiHelper {
             return null;
         }
 
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat(("yyyy-MM-dd")).create();
         Type listType = new TypeToken<ExchangeRatesApiResponse>(){}.getType();
         try {
             ExchangeRatesApiResponse response = gson.fromJson(resultRate, listType);

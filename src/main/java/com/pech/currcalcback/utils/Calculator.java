@@ -25,18 +25,19 @@ public class Calculator {
                                              BigDecimal amount,
                                              CurrencySymbols baseCurrency,
                                              CurrencySymbols quotedCurrency){
-        BigDecimal res = new BigDecimal(0);
         try {
-
 
             ExchangeRatesApiResponse ask = exchangeRatesApiHelper.getHistoricalExchangeRate(historicalDate,
                     baseCurrency.getSymbol(),
                     quotedCurrency.getSymbol());
-
             ExchangeRatesApiResponse bid = exchangeRatesApiHelper.getLatestExchangeRate(baseCurrency.getSymbol(),
                     quotedCurrency.getSymbol());
 
-            return res;
+            BigDecimal result = (bid.getRates().get(quotedCurrency.getSymbol())
+                    .subtract(ask.getRates().get(quotedCurrency.getSymbol())))
+                    .multiply(amount);
+
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {

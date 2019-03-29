@@ -1,7 +1,11 @@
 package com.pech.currcalcback.controllers;
 
+import com.google.gson.*;
+import com.pech.currcalcback.model.profitlosscalc.ErrorAnswer;
+import com.pech.currcalcback.model.profitlosscalc.SuccesfulAnswer;
 import com.pech.currcalcback.model.ratesapi.CurrencySymbols;
 import com.pech.currcalcback.utils.Calculator;
+import com.pech.currcalcback.utils.EnumErrorsAdapterFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
@@ -18,10 +22,10 @@ import java.time.format.DateTimeParseException;
 public class ProfitLossCalculator {
 
     @Inject
-    Calculator calculator;
+    private Calculator calculator;
 
     @GET
-    @Path("/calculate")
+    @Path("/calculate-usd-rub")
     public String calculateProfitLossByDate(
             @QueryParam("date") String date,
             @QueryParam("usdAmount") String usdAmount){
@@ -31,18 +35,35 @@ public class ProfitLossCalculator {
 
         LocalDate historicalDate;
         BigDecimal amount;
+
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapterFactory(new EnumErrorsAdapterFactory());
+        Gson gson = builder.create();
+
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             historicalDate = LocalDate.parse(date, formatter);
             amount = new BigDecimal(usdAmount);
-
         }catch (DateTimeParseException | NumberFormatException e){
-            return "{\"error\" : \"invalid parameter value\"}";
+            return gson.toJson(ErrorAnswer.PARAMETER_INVALID);
         }
 
-        return calculator.profitLossByDateForNow(historicalDate,
+        if (LocalDate.now().compareTo(historicalDate) <= 0){
+            return gson.toJson(ErrorAnswer.DATE_INVALID);
+        }
+
+        if (amount.compareTo(new BigDecimal(0)) <= 0){
+            return gson.toJson(ErrorAnswer.PARAMETER_INVALID);
+        }
+
+         BigDecimal result = calculator.profitLossByDateForNow(historicalDate,
                 amount,
                 CurrencySymbols.USD,
-                CurrencySymbols.RUB).toString();
+                CurrencySymbols.RUB);
+
+        if (result == null)
+            return gson.toJson(ErrorAnswer.CALCULATION_ERROR);
+
+        return gson.toJson(new SuccesfulAnswer(result));
     }
 }

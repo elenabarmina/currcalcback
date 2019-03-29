@@ -1,12 +1,14 @@
 package com.pech.currcalcback.model.ratesapi;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 public class ExchangeRatesApiResponse {
 
     String base;
-    private Map<String, String> rates;
-    String date;
+    private Map<String, BigDecimal> rates;
+    Date date;
 
     public String getBase() {
         return base;
@@ -16,23 +18,23 @@ public class ExchangeRatesApiResponse {
         this.base = base;
     }
 
-    public Map<String, String> getRates() {
+    public Map<String, BigDecimal> getRates() {
         return rates;
     }
 
-    public void setRate(Map<String, String> rates) {
+    public void setRate(Map<String, BigDecimal> rates) {
         this.rates = rates;
     }
 
-    public void addRate(Map<String, String> rates) {
+    public void addRate(Map<String, BigDecimal> rates) {
         this.rates = rates;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 }
