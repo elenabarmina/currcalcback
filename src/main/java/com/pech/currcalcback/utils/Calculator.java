@@ -2,6 +2,7 @@ package com.pech.currcalcback.utils;
 
 import com.pech.currcalcback.model.ratesapi.CurrencySymbols;
 import com.pech.currcalcback.model.ratesapi.ExchangeRatesApiHelper;
+import com.pech.currcalcback.model.ratesapi.ExchangeRatesApiResponse;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -23,12 +24,18 @@ public class Calculator {
     public BigDecimal profitLossByDateForNow(LocalDate historicalDate,
                                              BigDecimal amount,
                                              CurrencySymbols baseCurrency,
-                                             CurrencySymbols achievedCurrency){
+                                             CurrencySymbols quotedCurrency){
         BigDecimal res = new BigDecimal(0);
         try {
-            exchangeRatesApiHelper.getHistoricalRubRatesByDate(historicalDate,
+
+
+            ExchangeRatesApiResponse ask = exchangeRatesApiHelper.getHistoricalExchangeRate(historicalDate,
                     baseCurrency.getSymbol(),
-                    achievedCurrency.getSymbol());
+                    quotedCurrency.getSymbol());
+
+            ExchangeRatesApiResponse bid = exchangeRatesApiHelper.getLatestExchangeRate(baseCurrency.getSymbol(),
+                    quotedCurrency.getSymbol());
+
             return res;
         } catch (IOException e) {
             e.printStackTrace();

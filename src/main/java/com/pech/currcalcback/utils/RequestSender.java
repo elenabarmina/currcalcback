@@ -14,17 +14,12 @@ import java.net.URL;
 
 public final class RequestSender {
 
-    private static String url = "http://www.apache.org/";
-
     public static String sendRequest(URL url) throws URISyntaxException, IOException {
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url.toURI());
 
         HttpResponse response = client.execute(request);
-
-        System.out.println("Response Code : "
-                + response.getStatusLine().getStatusCode());
 
         BufferedReader rd = new BufferedReader(
                 new InputStreamReader(response.getEntity().getContent()));
