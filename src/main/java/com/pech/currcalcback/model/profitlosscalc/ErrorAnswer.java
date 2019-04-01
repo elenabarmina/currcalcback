@@ -11,4 +11,8 @@ public enum ErrorAnswer {
     ErrorAnswer(String errorDescription) {
         this.errorDescription = errorDescription;
     }
+
+    public String getErrorDescription() {
+        return errorDescription;
+    }
 }

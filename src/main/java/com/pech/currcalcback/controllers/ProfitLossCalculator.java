@@ -54,13 +54,13 @@ public class ProfitLossCalculator {
         }
 
         if (LocalDate.now().compareTo(historicalDate) <= 0){
-            Response.status(Response.Status.BAD_REQUEST)
+            return Response.status(Response.Status.BAD_REQUEST)
                     .entity(gson.toJson(ErrorAnswer.DATE_INVALID))
                     .build();
         }
 
         if (amount.compareTo(new BigDecimal(0)) <= 0){
-            Response.status(Response.Status.BAD_REQUEST)
+            return Response.status(Response.Status.BAD_REQUEST)
                     .entity(gson.toJson(ErrorAnswer.PARAMETER_INVALID))
                     .build();
         }
