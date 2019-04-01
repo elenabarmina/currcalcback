@@ -55,7 +55,7 @@ class ProfitLossCalculatorTest {
         for (Map.Entry<MethodParams, String> e : testData.entrySet()) {
             final String expected = e.getValue();
             final String actual = profitLossCalculator.calculateProfitLossByDate(e.getKey().getDate(),
-                    e.getKey().getUsdAmount());
+                    e.getKey().getUsdAmount()).getEntity().toString();
 
             assertEquals(expected, actual);
         }

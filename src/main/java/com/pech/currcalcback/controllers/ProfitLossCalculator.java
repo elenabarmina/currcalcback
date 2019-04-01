@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,34 +27,42 @@ public class ProfitLossCalculator {
 
     @GET
     @Path("/calculate-usd-rub")
-    public String calculateProfitLossByDate(
+    public Response calculateProfitLossByDate(
             @QueryParam("date") String date,
             @QueryParam("usdAmount") String usdAmount){
-
-        if(StringUtils.isEmpty(date) || StringUtils.isEmpty(usdAmount))
-            return "{}";
-
-        LocalDate historicalDate;
-        BigDecimal amount;
 
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapterFactory(new EnumErrorsAdapterFactory());
         Gson gson = builder.create();
+
+        if(StringUtils.isEmpty(date) || StringUtils.isEmpty(usdAmount))
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(gson.toJson(ErrorAnswer.PARAMETER_INVALID))
+                    .build();
+
+        LocalDate historicalDate;
+        BigDecimal amount;
 
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             historicalDate = LocalDate.parse(date, formatter);
             amount = new BigDecimal(usdAmount);
         }catch (DateTimeParseException | NumberFormatException e){
-            return gson.toJson(ErrorAnswer.PARAMETER_INVALID);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(gson.toJson(ErrorAnswer.PARAMETER_INVALID))
+                    .build();
         }
 
         if (LocalDate.now().compareTo(historicalDate) <= 0){
-            return gson.toJson(ErrorAnswer.DATE_INVALID);
+            Response.status(Response.Status.BAD_REQUEST)
+                    .entity(gson.toJson(ErrorAnswer.DATE_INVALID))
+                    .build();
         }
 
         if (amount.compareTo(new BigDecimal(0)) <= 0){
-            return gson.toJson(ErrorAnswer.PARAMETER_INVALID);
+            Response.status(Response.Status.BAD_REQUEST)
+                    .entity(gson.toJson(ErrorAnswer.PARAMETER_INVALID))
+                    .build();
         }
 
          BigDecimal result = calculator.profitLossByDateForNow(historicalDate,
@@ -62,8 +71,10 @@ public class ProfitLossCalculator {
                 CurrencySymbols.RUB);
 
         if (result == null)
-            return gson.toJson(ErrorAnswer.CALCULATION_ERROR);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(gson.toJson(ErrorAnswer.CALCULATION_ERROR))
+                    .build();
 
-        return gson.toJson(new SuccesfulAnswer(result));
+        return Response.ok(gson.toJson(new SuccesfulAnswer(result)), MediaType.APPLICATION_JSON).build();
     }
 }
