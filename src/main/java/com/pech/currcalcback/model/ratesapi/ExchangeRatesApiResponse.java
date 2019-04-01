@@ -10,6 +10,12 @@ public class ExchangeRatesApiResponse {
     private Map<String, BigDecimal> rates;
     Date date;
 
+    public ExchangeRatesApiResponse(String base, Map<String, BigDecimal> rates, Date date) {
+        this.base = base;
+        this.rates = rates;
+        this.date = date;
+    }
+
     public String getBase() {
         return base;
     }
@@ -36,5 +42,14 @@ public class ExchangeRatesApiResponse {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "ExchangeRatesApiResponse{" +
+                "base='" + base + '\'' +
+                ", rates=" + rates +
+                ", date=" + date +
+                '}';
     }
 }
