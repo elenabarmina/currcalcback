@@ -14,6 +14,8 @@ import java.time.LocalDate;
 @Stateless
 public class Calculator {
 
+    private final BigDecimal SPREAD_VALUE = new BigDecimal(0.005);
+
     @Inject
     private ExchangeRatesApiHelper exchangeRatesApiHelper;
 
@@ -27,17 +29,25 @@ public class Calculator {
                                              CurrencySymbols quotedCurrency){
         try {
 
-            ExchangeRatesApiResponse ask = exchangeRatesApiHelper.getHistoricalExchangeRate(historicalDate,
+            ExchangeRatesApiResponse askResponse = exchangeRatesApiHelper.getHistoricalExchangeRate(historicalDate,
                     baseCurrency.getSymbol(),
                     quotedCurrency.getSymbol());
-            ExchangeRatesApiResponse bid = exchangeRatesApiHelper.getLatestExchangeRate(baseCurrency.getSymbol(),
-                    quotedCurrency.getSymbol());
 
-            BigDecimal result = (bid.getRates().get(quotedCurrency.getSymbol())
-                    .subtract(ask.getRates().get(quotedCurrency.getSymbol())))
-                    .multiply(amount);
+            if (LocalDate.now().compareTo(historicalDate) == 0){
+                return askResponse.getRates().get(quotedCurrency.getSymbol()).multiply(SPREAD_VALUE).negate();
+            }
 
-            return result;
+            ExchangeRatesApiResponse bidResponse = exchangeRatesApiHelper.getLatestExchangeRate(baseCurrency.getSymbol(),
+                        quotedCurrency.getSymbol());
+
+            BigDecimal ask = askResponse.getRates().get(quotedCurrency.getSymbol());
+            BigDecimal bid = bidResponse.getRates().get(quotedCurrency.getSymbol());
+
+            BigDecimal askIncludingSpread = ask.add(SPREAD_VALUE.divide(new BigDecimal(2)).multiply(ask));
+            BigDecimal bidIncludingSpread = bid.subtract(SPREAD_VALUE.divide(new BigDecimal(2)).multiply(bid));
+
+            return amount.multiply(bidIncludingSpread.subtract(askIncludingSpread));
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {

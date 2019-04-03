@@ -53,7 +53,7 @@ public class ProfitLossCalculator {
                     .build();
         }
 
-        if (LocalDate.now().compareTo(historicalDate) <= 0){
+        if (LocalDate.now().compareTo(historicalDate) < 0){
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(gson.toJson(ErrorAnswer.DATE_INVALID))
                     .build();

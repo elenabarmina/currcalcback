@@ -32,13 +32,9 @@ class ProfitLossCalculatorTest {
         testData.put(new MethodParams("2019-35-01", "1"), "{\"error\":\"PARAMETER_INVALID\",\"errorDescription\":\"One or more parameters are invalid.\"}");
         testData.put(new MethodParams("01.05.2019", "1"), "{\"error\":\"PARAMETER_INVALID\",\"errorDescription\":\"One or more parameters are invalid.\"}");
 
-        Date today = Calendar.getInstance().getTime();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String strDate = formatter.format(today);
-        testData.put(new MethodParams(strDate, "1"), "{\"error\":\"DATE_INVALID\",\"errorDescription\":\"Date cannot be equals or more than current date.\"}");
-
         Date tomorrow = Calendar.getInstance().getTime();
-        strDate = formatter.format(tomorrow);
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = formatter.format(tomorrow);
         testData.put(new MethodParams(strDate, "1"), "{\"error\":\"DATE_INVALID\",\"errorDescription\":\"Date cannot be equals or more than current date.\"}");
     }
 
